@@ -14,7 +14,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @Entity
 @Table(name = "transactions")
-class Transaction {
+public class Transaction {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
