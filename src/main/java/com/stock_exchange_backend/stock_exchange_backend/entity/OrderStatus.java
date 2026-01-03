@@ -1,5 +1,5 @@
 package com.stock_exchange_backend.stock_exchange_backend.entity;
 
 public enum OrderStatus {
-    ACTIVE, ONGOING
+    ACTIVE, PROCESSING, COMPLETED, CANCELLED
 }
