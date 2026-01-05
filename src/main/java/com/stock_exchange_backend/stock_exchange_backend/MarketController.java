@@ -2,6 +2,7 @@ package com.stock_exchange_backend.stock_exchange_backend;
 
 import com.stock_exchange_backend.stock_exchange_backend.entity.Order;
 import com.stock_exchange_backend.stock_exchange_backend.entity.OrderStatus;
+import com.stock_exchange_backend.stock_exchange_backend.entity.Transaction;
 import com.stock_exchange_backend.stock_exchange_backend.repository.OrderRepository;
 import com.stock_exchange_backend.stock_exchange_backend.request.OrderRequest;
 import com.stock_exchange_backend.stock_exchange_backend.services.MarketService;
@@ -47,6 +48,26 @@ public class MarketController {
         }
 
         return marketService.orderStatus(orderId);
+    }
+
+    @GetMapping("/allOrders")
+    public ResponseEntity<List<Order>> getAllOrders(
+            @RequestHeader("Authorization") String authHeader) {
+        if (!isValidAuth(authHeader)) { // mock validation
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        List<Order> orders = marketService.getAllOrders();
+        return ResponseEntity.ok(orders);
+    }
+
+    @GetMapping("/allTransactions")
+    public ResponseEntity<List<Transaction>> getAllTransactions(
+            @RequestHeader("Authorization") String authHeader) {
+        if (!isValidAuth(authHeader)) { // mock validation
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        List<Transaction> transactions = marketService.getAllTransactions();
+        return ResponseEntity.ok(transactions);
     }
 
     private boolean isValidAuth(String authHeader) {

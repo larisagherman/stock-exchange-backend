@@ -14,6 +14,12 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
@@ -26,6 +32,33 @@ services:
       RABBITMQ_MANAGEMENT_LOAD_DEFINITIONS: /etc/rabbitmq/definitions.json
     volumes:
       - ./rabbitmq-definitions.json:/etc/rabbitmq/definitions.json
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: stock-exchange-backend
+    ports:
+      - "55554:55554"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/stock-exchange
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: cebp
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: guest
+      SPRING_RABBITMQ_PASSWORD: guest
+    depends_on:
+      db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    restart: on-failure
 
 volumes:
   pgdata:

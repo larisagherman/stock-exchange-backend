@@ -20,8 +20,8 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private int buyerId;
-    private int sellerId;
+    private String buyerId;
+    private String sellerId;
 
     private String ticker;
 
