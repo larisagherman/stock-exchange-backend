@@ -14,14 +14,14 @@ import java.time.Instant;
 @NoArgsConstructor
 @Entity
 @Table(name = "transactions")
-class Transaction {
+public class Transaction {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private int buyerId;
-    private int sellerId;
+    private String buyerId;
+    private String sellerId;
 
     private String ticker;
 
