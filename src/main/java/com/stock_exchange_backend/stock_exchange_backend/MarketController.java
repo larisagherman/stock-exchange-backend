@@ -70,6 +70,28 @@ public class MarketController {
         return ResponseEntity.ok(transactions);
     }
 
+    @DeleteMapping("/cancelOrder/{orderId}")
+    public ResponseEntity<Map<String, String>> cancelOrder(
+            @RequestHeader("Authorization") String authHeader,
+            @PathVariable Long orderId) {
+        if (!isValidAuth(authHeader)) { // mock validation
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        return marketService.cancelOrder(orderId);
+    }
+
+    @PutMapping("/updateOrder/{orderId}")
+    public ResponseEntity<Map<String, String>> updateOrder(
+            @RequestHeader("Authorization") String authHeader,
+            @PathVariable Long orderId,
+            @RequestParam(required = false) Double newPrice,
+            @RequestParam(required = false) Integer newQuantity) {
+        if (!isValidAuth(authHeader)) { // mock validation
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        return marketService.updateOrder(orderId, newPrice, newQuantity);
+    }
+
     private boolean isValidAuth(String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return false;

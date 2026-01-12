@@ -65,6 +65,7 @@ public class MarketService {
         return orderRepository.findById(orderId)
                 .map(order -> {
                     Map<String, String> body = Map.of("status", order.getStatus().toString(),
+                            "pricePerShare", String.valueOf(order.getPricePerShare()),
                             "quantity", String.valueOf(order.getQuantity()));
                     return ResponseEntity
                             .status(HttpStatus.OK)
@@ -73,5 +74,67 @@ public class MarketService {
                 .orElseGet(() -> ResponseEntity
                         .status(HttpStatus.NOT_FOUND)
                         .build());
+    }
+
+    public ResponseEntity<Map<String, String>> cancelOrder(@NonNull Long orderId) {
+        return orderRepository.findById(orderId)
+                .map(order -> {
+                    order.setStatus(OrderStatus.CANCELLED);
+                    orderRepository.save(order);
+                    Map<String, String> body = Map.of("message", "Order cancelled successfully");
+                    return ResponseEntity
+                            .status(HttpStatus.OK)
+                            .body(body);
+                })
+                .orElseGet(() -> {
+                    Map<String, String> body = Map.of("message", "Order not found");
+                    return ResponseEntity
+                            .status(HttpStatus.NOT_FOUND)
+                            .body(body);
+                });
+    }
+
+
+    public ResponseEntity<Map<String, String>> updateOrder(@NonNull Long orderId, Double newPrice, Integer newQuantity) {
+        return orderRepository.findById(orderId)
+                .map(order -> {
+                    boolean updated = false;
+                    StringBuilder message = new StringBuilder("Order updated: ");
+
+                    if (newPrice != null) {
+                        order.setPricePerShare(newPrice);
+                        message.append("price");
+                        updated = true;
+                    }
+
+                    if (newQuantity != null) {
+                        if (updated) {
+                            message.append(" and quantity");
+                        } else {
+                            message.append("quantity");
+                        }
+                        order.setQuantity(newQuantity);
+                        updated = true;
+                    }
+
+                    if (updated) {
+                        orderRepository.save(order);
+                        Map<String, String> body = Map.of("message", message.toString());
+                        return ResponseEntity
+                                .status(HttpStatus.OK)
+                                .body(body);
+                    } else {
+                        Map<String, String> body = Map.of("message", "No fields to update");
+                        return ResponseEntity
+                                .status(HttpStatus.BAD_REQUEST)
+                                .body(body);
+                    }
+                })
+                .orElseGet(() -> {
+                    Map<String, String> body = Map.of("message", "Order not found");
+                    return ResponseEntity
+                            .status(HttpStatus.NOT_FOUND)
+                            .body(body);
+                });
     }
 }
